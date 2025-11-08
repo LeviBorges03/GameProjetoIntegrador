@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Ciano Final - RGB</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <div id="jogoContainer">
+        <div id="placar">
+            <div id="vidasContainerEsquerda" class="vidas-container"></div>
+            <div id="xpContainer">
+                <div id="xpBar"></div>
+                <span id="nivelDisplay">1</span>
+            </div>
+            <div id="vidasContainerDireita" class="vidas-container"></div>
+            <button id="btnReiniciarNivel">Reiniciar Nível</button>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="menuCustomizacao" class="tela hidden">
+            <h2>Personalização</h2>
+            <div class="conteudo-customizacao">
+                <div class="preview-personagem">
+                    <canvas id="previewCanvas" width="150" height="150"></canvas>
+                    <input type="text" id="inputNick" placeholder="Seu Nick" maxlength="7">
+                </div>
+                <div class="opcoes">
+                    <div class="secao-cores">
+                        <h3>Cores</h3>
+                        <input type="color" id="seletorCorAvancado" value="#a7d1fa">
+                    </div>
+                    <div class="secao-efeitos">
+                        <h3>Efeitos</h3>
+                        <div id="listaEfeitos" class="lista-efeitos"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="secao-slots">
+                <h3>Personagens Salvos</h3>
+                <div id="slotsContainer" class="slots-container">
+                    <!-- Slots serão gerados dinamicamente pelo JS -->
+                </div>
+            </div>
+            <div class="botoes-menu">
+                <button id="btnFecharMenu">Fechar</button>
+                <button id="btnAjuda" class="btn-ajuda">?</button>
+            </div>
+        </div>
+
+        <div id="telaInicial" class="tela">
+            <h2>Bem-vindo ao Jogo de Plataforma Ciano!</h2>
+            <p>Use WAD ou Setas para Mover/Pular (Pulo Duplo).</p>
+            <button id="btnJogar">JOGAR</button>
+        </div>
+
+        <div id="telaFinal" class="tela hidden">
+            <h2 id="tituloFinal"></h2>
+            <p id="mensagemFinal"></p>
+            <button id="btnJogarNovamente">JOGAR DE NOVO</button>
+        </div>
+    </div>
+
+    <button id="btnCustomizacao" class="btn-lateral-offgame">🎨</button>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+# Documentação do Projeto: Plataforma Ciano
+
+## Visão Geral
+
+Este documento detalha a estrutura e o funcionamento do jogo "Plataforma Ciano", um jogo de plataforma 2D desenvolvido com HTML, CSS e JavaScript. O objetivo é que qualquer pessoa, mesmo sem executar o código, possa entender como cada parte do projeto funciona.
+
+## 1. Estrutura de Arquivos
+
+O projeto está organizado da seguinte forma:
+
+- `index.html`: A estrutura principal da página e do jogo.
+- `style.css`: Contém todos os estilos visuais.
+- `js/`: Pasta que abriga o código JavaScript, dividido em módulos.
+  - `constants.js`: Define as constantes globais do jogo.
+  - `player.js`: Controla o estado e a lógica do jogador.
+  - `game.js`: Contém a lógica central do jogo (mapas, colisões, regras).
+  - `ui.js`: Gerencia a interface do usuário (menus, placar, etc.).
+  - `main.js`: Ponto de entrada do jogo, responsável pela renderização e pelo loop principal.
+
+## 2. `index.html` - A Estrutura
+
+O `index.html` é o esqueleto da aplicação. Seus principais componentes são:
+
+- `<div id="jogoContainer">`: O contêiner principal que envolve todos os elementos visuais do jogo.
+- `<div id="placar">`: A barra superior que exibe as vidas, o nível e a barra de XP.
+- `<canvas id="gameCanvas">`: A "tela" onde o jogo é desenhado e acontece a ação.
+- `<div id="menuCustomizacao">`: O menu de personalização do personagem, inicialmente oculto.
+- `<div id="telaInicial">`: A tela de boas-vindas com o botão "JOGAR".
+- `<div id="telaFinal">`: A tela que aparece no final do jogo (vitória ou game over).
+- `<script>`: As tags no final do `<body>` carregam os arquivos JavaScript na ordem correta de dependência.
+
+## 3. `style.css` - A Aparência
+
+O `style.css` é responsável por todo o visual do jogo, desde as cores até a disposição dos elementos.
+
+- **Estilo Geral (`body`, `#jogoContainer`):** Define um fundo escuro e centraliza o contêiner do jogo, criando uma moldura que o destaca.
+- **Placar (`#placar`, `.vidas-container`, etc.):** Estiliza a barra de informações superior, incluindo os corações que representam as vidas e a barra de XP que indica o progresso.
+- **Telas de Menu (`.tela`, `#telaInicial`, etc.):** As telas de menu são sobreposições (`position: absolute`) com fundo semitransparente para se destacarem do jogo. Os botões têm um efeito de "hover" para melhorar a interatividade.
+- **Menu de Customização (`#menuCustomizacao`, `.slot`):** É o componente mais complexo. Utiliza `flexbox` e `grid` para organizar as opções de personalização (nick, cores, efeitos) e os "slots" para salvar personagens.
+- **Animações e Efeitos (`@keyframes`):** Inclui animações sutis, como o brilho em alguns elementos, para dar mais vida à interface.
+
+## 4. `js/` - A Lógica do Jogo
+
+### `constants.js`
+Este arquivo centraliza todas as "regras" e valores fixos do jogo em um único objeto `CONFIG`. Isso facilita o ajuste de parâmetros como a gravidade, a velocidade do jogador, o número de vidas, etc., sem precisar alterar a lógica principal.
+
+### `player.js`
+Aqui, a lógica do personagem é gerenciada:
+- `jogador`: Um objeto que armazena a posição, velocidade e estado do jogador.
+- `teclas`: Um objeto que rastreia quais teclas de controle estão sendo pressionadas.
+- `event listeners`: Capturam os eventos de `keydown` e `keyup` para atualizar o estado das teclas.
+- `aplicarMovimentoJogador()`: Função que, a cada quadro, atualiza a posição do jogador com base nas teclas pressionadas e na gravidade.
+
+### `game.js`
+Este é o coração do jogo.
+- `gameState`: Objeto que armazena o estado atual do jogo (nível, mapa, vidas, etc.).
+- `criarMapa()`: Gera o mapa do nível, adicionando mais desafios à medida que o jogador avança.
+- `verificarColisoes()`: Detecta e reage a colisões entre o jogador e os elementos do mapa (paredes, lava, chaves, etc.).
+- `morrer()` e `avancarNivel()`: Funções que controlam o fluxo do jogo, reiniciando o nível ou avançando para o próximo.
+- `iniciarJogo()`: Prepara e inicia uma nova partida.
+
+### `ui.js`
+Gerencia toda a interação com a interface do usuário.
+- **Seleção de Elementos:** Obtém referências a todos os elementos do DOM (botões, telas, etc.).
+- **Listeners de UI:** Configura o que cada botão faz (iniciar jogo, abrir menu, etc.).
+- **Lógica de Customização:** Inclui as funções para salvar, carregar e deletar personagens, atualizando a aparência do jogador e a interface do menu.
+- `atualizarPlacar()`: Atualiza os elementos visuais do placar, como as vidas e a barra de XP.
+- `mostrarTelaFinal()`: Exibe a tela de fim de jogo com a mensagem apropriada.
+
+### `main.js`
+É o arquivo que une tudo e controla o fluxo principal.
+- **Funções de Desenho:**
+  - `desenhar()`: Limpa o canvas e desenha todos os elementos do jogo (mapa, jogador, partículas) a cada quadro.
+  - `desenharPreview()`: Desenha a prévia do personagem no menu de customização.
+- **Loop Principal:**
+  - `atualizar()`: Chama as funções que atualizam a lógica do jogo (movimento, colisões).
+  - `gameLoop()`: A função principal que é chamada repetidamente (`requestAnimationFrame`) para criar a animação e a jogabilidade. Ela chama `atualizar()`, `desenhar()` e `atualizarPlacar()` em sequência.
+- **Inicialização (`setup()`):** É a primeira função a ser executada. Ela configura o canvas, adiciona os listeners da UI e inicia o jogo pela primeira vez.
