@@ -625,7 +625,13 @@ const EFEITOS = {
         update: (ctx, cx, cy, p, gs, j, criar) => {
              if (gs.framesDesdeInicio % 6 === 0) {
                 const lifetime = Math.random() * 80 + 40;
-                particulas.push({ x: cx, y: cy, duracao: lifetime, vida: lifetime, tamanho: Math.random() * 3 + 1, cor: '100,100,100', originalColor: '255,100,0', vy: -1, vx: (Math.random() - 0.5) });
+                particulas.push({ 
+                    x: cx, y: cy, duracao: lifetime, vida: lifetime, 
+                    tamanho: Math.random() * 3 + 1, 
+                    cor: '255,100,0', // Start hot
+                    finalCor: '50,50,50', // End cool
+                    vy: -1, vx: (Math.random() - 0.5) 
+                });
              }
         }
     },
@@ -881,7 +887,7 @@ const EFEITOS = {
         }
     },
      'matrix_fragments': {
-        nome: "Matrix Fragments", emoji: " fragmented",
+        nome: "Matrix Fragments", emoji: "碎",
         update: (ctx, cx, cy, p, gs, j, criar) => {
             if (gs.framesDesdeInicio % 7 === 0) {
                  const char = "[]{}()";
@@ -893,13 +899,14 @@ const EFEITOS = {
      'matrix_decryption': {
         nome: "Matrix Decryption", emoji: "🔑",
         update: (ctx, cx, cy, p, gs, j) => {
-             if (Math.random() > 0.95) {
-                const randomChar = String.fromCharCode(Math.random() * 94 + 33);
+             if (gs.framesDesdeInicio % 10 === 0 && Math.random() > 0.7) { // Trigger less often
                 const finalChar = String.fromCharCode(0x30A0 + Math.random() * 96);
-                particulas.push({ x: cx, y: cy, duracao: 20, vida: 20, texto: randomChar, cor: '#C1FFC1' });
-                setTimeout(() => {
-                     particulas.push({ x: cx, y: cy, duracao: 20, vida: 20, texto: finalChar, cor: '#00FF00' });
-                }, 50);
+                // Create a "scrambler" particle
+                particulas.push({ 
+                    x: cx, y: cy, duracao: 15, vida: 15, 
+                    scramble: true, finalText: finalChar, 
+                    cor: '#C1FFC1', finalCor: '#00FF00'
+                });
              }
         }
     },
@@ -1021,12 +1028,56 @@ const EFEITOS = {
     'matrix_loop': {
         nome: "Matrix Infinite Loop", emoji: "🔄",
         update: (ctx, cx, cy, p, gs, j) => {
-            const angle = gs.framesDesdeInicio * 0.1;
-            const x = cx + Math.cos(angle) * 30;
-            const y = cy + Math.sin(angle) * 30;
-            particulas.push({ x, y, duracao: 5, vida: 5, texto: '∞', cor: '#00FF7F' });
+            EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '∞', '#00FF7F', 0.1, 30);
+        },
+        orbital: (ctx, cx, cy, p, gs, texto, cor, velocidade, raio, senoidal = false, amp = 15) => {
+            const angle = gs.framesDesdeInicio * velocidade;
+            const currentRadius = senoidal ? raio + Math.sin(gs.framesDesdeInicio * velocidade * 2) * amp : raio;
+            const x = cx + Math.cos(angle) * currentRadius;
+            const y = cy + Math.sin(angle) * currentRadius;
+            particulas.push({ x, y, duracao: 8, vida: 8, texto: texto, cor: cor });
         }
     },
+    // --- Novos Efeitos de Loop Infinito ---
+    'loop_atom': { nome: "Atomic Loop", emoji: "⚛️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '⚛️', '#00FFFF', 0.1, 30) },
+    'loop_dna': { nome: "DNA Loop", emoji: "🧬", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🧬', '#FF00FF', 0.08, 35, true) },
+    'loop_star': { nome: "Star Loop", emoji: "⭐", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '⭐', '#FFFF00', 0.12, 25) },
+    'loop_heart': { nome: "Heart Loop", emoji: "❤️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '❤️', '#FF0000', 0.05, 40) },
+    'loop_money': { nome: "Money Loop", emoji: "💲", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '💲', '#00FF00', 0.15, 20) },
+    'loop_fire': { nome: "Fire Loop", emoji: "🔥", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔥', '#FF4500', 0.1, 30, true) },
+    'loop_ice': { nome: "Ice Loop", emoji: "❄️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '❄️', '#ADD8E6', 0.07, 38) },
+    'loop_yingyang': { nome: "YingYang Loop", emoji: "☯️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☯️', '#FFFFFF', 0.05, 30) },
+    'loop_peace': { nome: "Peace Loop", emoji: "☮️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☮️', '#FFC0CB', 0.08, 32) },
+    'loop_biohazard': { nome: "Biohazard Loop", emoji: "☣️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☣️', '#FFFF00', 0.1, 28) },
+    'loop_smile': { nome: "Smile Loop", emoji: "😊", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '😊', '#FFD700', 0.1, 30, true, 20) },
+    'loop_music': { nome: "Music Loop", emoji: "🎵", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🎵', '#8A2BE2', 0.12, 25) },
+    'loop_gear': { nome: "Gear Loop", emoji: "⚙️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '⚙️', '#C0C0C0', 0.06, 40) },
+    'loop_recycle': { nome: "Recycle Loop", emoji: "♻️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '♻️', '#008000', 0.1, 30) },
+    'loop_warning': { nome: "Warning Loop", emoji: "⚠️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '⚠️', '#FFD700', 0.09, 33) },
+    'loop_pizza': { nome: "Pizza Loop", emoji: "🍕", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🍕', '#FFA500', 0.1, 30, false, 40) },
+    'loop_ghost': { nome: "Ghost Loop", emoji: "👻", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '👻', '#E6E6FA', 0.08, 35, true) },
+    'loop_alien': { nome: "Alien Loop", emoji: "👽", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '👽', '#98FB98', 0.11, 28) },
+    'loop_moon': { nome: "Moon Loop", emoji: "🌙", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🌙', '#F0E68C', 0.05, 45) },
+    'loop_sun': { nome: "Sun Loop", emoji: "☀️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☀️', '#FFD700', 0.07, 42) },
+    'loop_cloud': { nome: "Cloud Loop", emoji: "☁️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☁️', '#F5F5F5', 0.1, 30, true, 20) },
+    'loop_umbrella': { nome: "Umbrella Loop", emoji: "☂️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☂️', '#DA70D6', 0.09, 34) },
+    'loop_coffee': { nome: "Coffee Loop", emoji: "☕", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '☕', '#8B4513', 0.1, 29) },
+    'loop_controller': { nome: "Controller Loop", emoji: "🎮", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🎮', '#808080', 0.13, 22) },
+    'loop_crown': { nome: "Crown Loop", emoji: "👑", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '👑', '#FFD700', 0.08, 36) },
+    'loop_diamond': { nome: "Diamond Loop", emoji: "💎", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '💎', '#B9F2FF', 0.1, 30, false, 30) },
+    'loop_rocket': { nome: "Rocket Loop", emoji: "🚀", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🚀', '#FF4500', 0.15, 20, true) },
+    'loop_key': { nome: "Key Loop", emoji: "🔑", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔑', '#FFD700', 0.1, 30, false, 25) },
+    'loop_lock': { nome: "Lock Loop", emoji: "🔒", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔒', '#C0C0C0', 0.06, 38) },
+    'loop_bulb': { nome: "Bulb Loop", emoji: "💡", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '💡', '#FFFFE0', 0.1, 30, true, 10) },
+    'loop_bomb': { nome: "Bomb Loop", emoji: "💣", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '💣', '#808080', 0.1, 30, false, 5) },
+    'loop_bell': { nome: "Bell Loop", emoji: "🔔", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔔', '#FFD700', 0.12, 27) },
+    'loop_magnet': { nome: "Magnet Loop", emoji: "🧲", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🧲', '#B22222', 0.1, 30, true, 30) },
+    'loop_battery': { nome: "Battery Loop", emoji: "🔋", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔋', '#7CFC00', 0.07, 39) },
+    'loop_wrench': { nome: "Wrench Loop", emoji: "🔧", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔧', '#A9A9A9', 0.09, 31) },
+    'loop_compass': { nome: "Compass Loop", emoji: "🧭", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🧭', '#DEB887', 0.05, 42) },
+    'loop_joystick': { nome: "Joystick Loop", emoji: "🕹️", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🕹️', '#DC143C', 0.14, 23) },
+    'loop_crystal_ball': { nome: "Crystal Ball Loop", emoji: "🔮", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔮', '#BA55D3', 0.08, 35) },
+    'loop_telescope': { nome: "Telescope Loop", emoji: "🔭", update: (ctx, cx, cy, p, gs) => EFEITOS.matrix_loop.orbital(ctx, cx, cy, p, gs, '🔭', '#4682B4', 0.06, 40, true, 25) },
     'matrix_packet': {
         nome: "Matrix Packet", emoji: "📦",
         update: (ctx, cx, cy, p, gs, j, criar) => {
@@ -1400,12 +1451,41 @@ function desenharMapa() {
 function desenharParticulas() {
     particulas.forEach(p => {
         const opacidade = p.vida / p.duracao;
-        if (p.texto) { // Se for uma partícula de texto
-            ctx.font = '20px Arial';
-            ctx.fillStyle = p.cor ? `rgba(${hexParaRgb(p.cor)}, ${opacidade})` : `rgba(255, 255, 255, ${opacidade})`;
-            ctx.fillText(p.texto, p.x, p.y);
+        let corFinal = p.cor;
+
+        // NEW: Handle color transition for particles like cinders
+        if (p.finalCor) {
+            const rInicial = parseInt(p.cor.split(',')[0]);
+            const gInicial = parseInt(p.cor.split(',')[1]);
+            const bInicial = parseInt(p.cor.split(',')[2]);
+            const rFinal = parseInt(p.finalCor.split(',')[0]);
+            const gFinal = parseInt(p.finalCor.split(',')[1]);
+            const bFinal = parseInt(p.finalCor.split(',')[2]);
+
+            const progress = 1 - opacidade; // 0 -> 1 as particle dies
+            const r = Math.floor(rInicial + (rFinal - rInicial) * progress);
+            const g = Math.floor(gInicial + (gFinal - gInicial) * progress);
+            const b = Math.floor(bInicial + (bFinal - bInicial) * progress);
+            corFinal = `${r},${g},${b}`;
+        }
+
+        if (p.texto || p.scramble) { // Se for uma partícula de texto ou scrambler
+            ctx.font = '20px monospace';
+            const corTexto = p.cor.startsWith('#') ? hexParaRgb(p.cor) : corFinal;
+            ctx.fillStyle = `rgba(${corTexto || '255,255,255'}, ${opacidade})`;
+
+            let textoFinal = p.texto;
+            // NEW: Handle scrambling text effect
+            if (p.scramble) {
+                if (p.vida < 5) { // Last few frames
+                    textoFinal = p.finalText;
+                } else {
+                    textoFinal = String.fromCharCode(Math.random() * 94 + 33);
+                }
+            }
+            ctx.fillText(textoFinal, p.x, p.y);
         } else { // Partícula normal
-            ctx.fillStyle = `rgba(${p.cor}, ${opacidade})`;
+            ctx.fillStyle = `rgba(${corFinal}, ${opacidade})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.tamanho * opacidade, 0, Math.PI * 2);
             ctx.fill();
